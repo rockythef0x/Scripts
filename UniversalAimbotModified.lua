@@ -1,28 +1,74 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+--!nocheck
+--!nolint UnknownGlobal
 
-local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
-local TeleportService = game:GetService("TeleportService")
-local players = game:GetService("Players")
-local wrk = game:GetService("Workspace")
-local plr = players.LocalPlayer
-local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
-local humanoid = plr.Character:FindFirstChild("Humanoid")
+local env = type(getgenv) == 'function' and getgenv()
+
+if type(env) == 'table' then
+    if type(env.stop_rocky_aimbot_modded) == 'function' then
+        env.stop_rocky_aimbot_modded()
+    end
+else
+    return error('Missing global environment')
+end
+
+local cloneref = type(cloneref) == 'function' and cloneref or function(object)
+    return object
+end
+
+local insert = table.insert
+local connections = {}
+local instances = {}
+local create = Instance.new
+
+local newInstance = function(class_name, parent)
+    local object = create(class_name, parent)
+    insert(instances, object)
+    return object
+end
+
+local connect = function(signal, callback)
+    local connection = signal:Connect(callback)
+    insert(connections, connection)
+    return connection
+end
+
+local str = select(2, pcall(game.HttpGet, game, 'https://sirius.menu/rayfield'))
+if type(str) == 'string' then
+    local f = select(2, pcall(loadstring, str))
+    if type(f) == 'function' then
+        Rayfield = select(2, pcall(f))
+    end
+end
+
+if type(Rayfield) ~= 'table' then
+    error('Rayfield missing or failed to load')
+    return
+end
+
+local Players = cloneref(game:GetService("Players"))
+local RunService = cloneref(game:GetService("RunService"))
+local HttpService = cloneref(game:GetService("HttpService"))
+local TeleportService = cloneref(game:GetService("TeleportService"))
+
+local plr = Players.LocalPlayer
+local char = plr.Character
+local humanoid = char and char:FindFirstChildWhichIsA('Humanoid')
+local hrp = humanoid and humanoid.RootPart or (char and char:FindFirstChild('HumanoidRootPart'))
 
 local function onCharacterAdded(character)
-    hrp = character:WaitForChild("HumanoidRootPart")
-    humanoid = character:WaitForChild("Humanoid")
+    char = character
+    humanoid = char and char:FindFirstChildWhichIsA('Humanoid')
+    hrp = humanoid and humanoid.RootPart or (char and char:FindFirstChild('HumanoidRootPart'))
 end
 
-plr.CharacterAdded:Connect(onCharacterAdded)
+connect(plr.CharacterAdded, onCharacterAdded)
 
-if plr.Character then
-    onCharacterAdded(plr.Character)
+if char then
+    onCharacterAdded(char)
 end
 
-local camera = wrk.CurrentCamera
+local camera = workspace.CurrentCamera
 local mouse = plr:GetMouse()
-
 local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
 local hue = 0
@@ -58,13 +104,10 @@ local spinBotSpeed = 20
 local circleColor = Color3.fromRGB(255, 0, 0)
 local targetedCircleColor = Color3.fromRGB(0, 255, 0)
 
-local aimViewerEnabled = false
-local ignoreSelf = true
-
 local Window = Rayfield:CreateWindow({
     Name = "▶ Universal Hub ◀",
     LoadingTitle = "Loading...",
-    LoadingSubtitle = "by Agreed 🥵\nFixed by Rocky",
+    LoadingSubtitle = "by Agreed 🥵\nFixed by Rocky & thuarnel",
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "UniversalHub",
@@ -86,7 +129,7 @@ fovCircle.Visible = false
 local currentTarget = nil
 
 local function checkTeam(player)
-    if teamCheck and player.Team == plr.Team then
+    if teamCheck and typeof(player.Team) == 'Instance' and player.Team == plr.Team then
         return true
     end
     return false
@@ -100,16 +143,15 @@ local function checkWall(targetCharacter)
     local direction = (targetHead.Position - origin).unit * (targetHead.Position - origin).magnitude
     local raycastParams = RaycastParams.new()
     raycastParams.FilterDescendantsInstances = {plr.Character, targetCharacter}
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
-    local raycastResult = wrk:Raycast(origin, direction, raycastParams)
+    local raycastResult = workspace:Raycast(origin, direction, raycastParams)
     return raycastResult and raycastResult.Instance ~= nil
 end
 
 local function getClosestPart(character)
     local closestPart = nil
     local shortestCursorDistance = aimFov
-    local cameraPos = camera.CFrame.Position
 
     for _, partName in ipairs(aimParts) do
         local part = character:FindFirstChild(partName)
@@ -133,7 +175,7 @@ local function getTarget()
     local closestPart = nil
     local shortestCursorDistance = aimFov
 
-    for _, player in ipairs(players:GetPlayers()) do
+    for _, player in ipairs(Players:GetPlayers()) do
         if player ~= plr and player.Character and not checkTeam(player) then
             if player.Character:FindFirstChildOfClass("Humanoid") and player.Character.Humanoid.Health >= minHealth or not healthCheck then
                 local targetPart = getClosestPart(player.Character)
@@ -179,7 +221,9 @@ local function aimAt(player, part)
     end
 end
 
-RunService.RenderStepped:Connect(function()
+local currentTargetPart
+
+connect(RunService.RenderStepped, function()
     if aimbotEnabled then
         local offset = 50
         fovCircle.Position = Vector2.new(mouse.X, mouse.Y + offset)
@@ -222,7 +266,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-RunService.Heartbeat:Connect(function()
+connect(RunService.Heartbeat, function()
     if antiAim then
         if antiAimMethod == "Reset Velo" then
             local vel = hrp.Velocity
@@ -246,19 +290,19 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-mouse.Button2Down:Connect(function()
+connect(mouse.Button2Down, function()
     if aimbotEnabled then
         aiming = true
     end
 end)
 
-mouse.Button2Up:Connect(function()
+connect(mouse.Button2Up, function()
     if aimbotEnabled then
         aiming = false
     end
 end)
 
-local aimbot = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Aimbot",
     CurrentValue = false,
     Flag = "Aimbot",
@@ -268,7 +312,7 @@ local aimbot = Aimbot:CreateToggle({
     end
 })
 
-local aimpart = Aimbot:CreateDropdown({
+Aimbot:CreateDropdown({
     Name = "Aim Part",
     Options = {"Head","HumanoidRootPart","Left Arm","Right Arm","Torso","Left Leg","Right Leg"},
     CurrentOption = {"Head"},
@@ -279,7 +323,7 @@ local aimpart = Aimbot:CreateDropdown({
     end,
  })
 
-local smoothingslider = Aimbot:CreateSlider({
+Aimbot:CreateSlider({
     Name = "Smoothing",
     Range = {0, 100},
     Increment = 1,
@@ -290,7 +334,7 @@ local smoothingslider = Aimbot:CreateSlider({
     end,
 })
 
-local predictionstrength = Aimbot:CreateSlider({
+Aimbot:CreateSlider({
     Name = "Prediction Strength",
     Range = {0, 0.2},
     Increment = 0.001,
@@ -301,7 +345,7 @@ local predictionstrength = Aimbot:CreateSlider({
     end,
 })
 
-local fovvisibility = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Fov Visibility",
     CurrentValue = true,
     Flag = "FovVisibility",
@@ -310,7 +354,7 @@ local fovvisibility = Aimbot:CreateToggle({
     end
 })
 
-local aimbotfov = Aimbot:CreateSlider({
+Aimbot:CreateSlider({
     Name = "Aimbot Fov",
     Range = {0, 1000},
     Increment = 1,
@@ -322,7 +366,7 @@ local aimbotfov = Aimbot:CreateSlider({
     end,
 })
 
-local wallcheck = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Wall Check",
     CurrentValue = true,
     Flag = "WallCheck",
@@ -331,7 +375,7 @@ local wallcheck = Aimbot:CreateToggle({
     end
 })
 
-local stickyaim = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Sticky Aim",
     CurrentValue = false,
     Flag = "StickyAim",
@@ -340,7 +384,7 @@ local stickyaim = Aimbot:CreateToggle({
     end
 })
 
-local teamchecktoggle = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Team Check",
     CurrentValue = false,
     Flag = "TeamCheck",
@@ -349,7 +393,7 @@ local teamchecktoggle = Aimbot:CreateToggle({
     end
 })
 
-local healthchecktoggle = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Health Check",
     CurrentValue = false,
     Flag = "HealthCheck",
@@ -358,7 +402,7 @@ local healthchecktoggle = Aimbot:CreateToggle({
     end
 })
 
-local minhealth = Aimbot:CreateSlider({
+Aimbot:CreateSlider({
     Name = "Min Health",
     Range = {0, 100},
     Increment = 1,
@@ -369,7 +413,7 @@ local minhealth = Aimbot:CreateSlider({
     end,
 })
 
-local circlecolor = Aimbot:CreateColorPicker({
+Aimbot:CreateColorPicker({
     Name = "Fov Color",
     Color = circleColor,
     Callback = function(Color)
@@ -378,7 +422,7 @@ local circlecolor = Aimbot:CreateColorPicker({
     end
 })
 
-local targetedcirclecolor = Aimbot:CreateColorPicker({
+Aimbot:CreateColorPicker({
     Name = "Targeted Fov Color",
     Color = targetedCircleColor,
     Callback = function(Color)
@@ -386,7 +430,7 @@ local targetedcirclecolor = Aimbot:CreateColorPicker({
     end
 })
 
-local circlerainbow = Aimbot:CreateToggle({
+Aimbot:CreateToggle({
     Name = "Rainbow Fov",
     CurrentValue = false,
     Flag = "RainbowFov",
@@ -395,7 +439,7 @@ local circlerainbow = Aimbot:CreateToggle({
     end
 })
 
-local antiaimtoggle = AntiAim:CreateToggle({
+AntiAim:CreateToggle({
     Name = "Anti-Aim",
     CurrentValue = false,
     Flag = "AntiAim",
@@ -409,7 +453,7 @@ local antiaimtoggle = AntiAim:CreateToggle({
     end
 })
 
-local antiaimmethod = AntiAim:CreateDropdown({
+AntiAim:CreateDropdown({
     Name = "Anti-Aim Method",
     Options = {"Reset Velo","Random Velo","Reset Pos [BROKEN]"},
     CurrentOption = "Reset Velo",
@@ -426,7 +470,7 @@ local antiaimmethod = AntiAim:CreateDropdown({
     end,
 })
 
-local antiaimamountx = AntiAim:CreateSlider({
+AntiAim:CreateSlider({
     Name = "Anti-Aim Amount X",
     Range = {-1000, 1000},
     Increment = 10,
@@ -437,7 +481,7 @@ local antiaimamountx = AntiAim:CreateSlider({
     end,
 })
 
-local antiaimamounty = AntiAim:CreateSlider({
+AntiAim:CreateSlider({
     Name = "Anti-Aim Amount Y",
     Range = {-1000, 1000},
     Increment = 10,
@@ -448,7 +492,7 @@ local antiaimamounty = AntiAim:CreateSlider({
     end,
 })
 
-local antiaimamountz = AntiAim:CreateSlider({
+AntiAim:CreateSlider({
     Name = "Anti-Aim Amount Z",
     Range = {-1000, 1000},
     Increment = 10,
@@ -459,7 +503,7 @@ local antiaimamountz = AntiAim:CreateSlider({
     end,
 })
 
-local randomvelorange = AntiAim:CreateSlider({
+AntiAim:CreateSlider({
     Name = "Random Velo Range",
     Range = {0, 1000},
     Increment = 10,
@@ -472,7 +516,7 @@ local randomvelorange = AntiAim:CreateSlider({
 
 -- [< Misc >]
 
-local spinbottoggle = Misc:CreateToggle({
+Misc:CreateToggle({
     Name = "Spin-Bot",
     CurrentValue = false,
     Flag = "SpinBot",
@@ -485,7 +529,7 @@ local spinbottoggle = Misc:CreateToggle({
                 end
             end
             plr.Character.Humanoid.AutoRotate = false
-            local Spin = Instance.new("BodyAngularVelocity")
+            local Spin = newInstance("BodyAngularVelocity")
             Spin.Name = "Spinning"
             Spin.Parent = hrp
             Spin.MaxTorque = Vector3.new(0, math.huge, 0)
@@ -503,7 +547,7 @@ local spinbottoggle = Misc:CreateToggle({
     end
 })
 
-local spinbotspeed = Misc:CreateSlider({
+Misc:CreateSlider({
     Name = "Spin-Bot Speed",
     Range = {0, 1000},
     Increment = 1,
@@ -517,7 +561,7 @@ local spinbotspeed = Misc:CreateSlider({
                     v:Destroy()
                 end
             end
-            local Spin = Instance.new("BodyAngularVelocity")
+            local Spin = newInstance("BodyAngularVelocity")
             Spin.Name = "Spinning"
             Spin.Parent = hrp
             Spin.MaxTorque = Vector3.new(0, math.huge, 0)
@@ -526,7 +570,7 @@ local spinbotspeed = Misc:CreateSlider({
     end,
 })
 
-local ServerHop = Misc:CreateButton({
+Misc:CreateButton({
 	Name = "Server Hop",
 	Callback = function()
 		if httprequest then
@@ -552,3 +596,20 @@ local ServerHop = Misc:CreateButton({
         end
 	end,
 })
+
+function env.stop_rocky_aimbot_modded()
+    if fovCircle then fovCircle:Remove() end
+    if type(Rayfield) == 'table' and type(Rayfield.Destroy) == 'function' then Rayfield:Destroy() end
+
+    for _, instance in pairs(instances) do
+        if typeof(instance) == 'Instance' then
+            instance:Destroy()
+        end
+    end
+
+    for _, connection in pairs(connections) do
+        if typeof(connection) == 'RBXScriptConnection' and connection.Connected then
+            connection:Disconnect()
+        end
+    end
+end
