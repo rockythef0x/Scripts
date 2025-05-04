@@ -1,4 +1,9 @@
 local localPlr = game:GetService("Players").LocalPlayer
+if getgenv().ndsscripthasRun then
+    return
+else
+    getgenv().ndsscripthasRun = true
+end
 
 -- Settings defaults cuz some people might run without
 -- I know my method to do this is ass be quiet
