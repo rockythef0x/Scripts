@@ -1,5 +1,17 @@
 local localPlr = game:GetService("Players").LocalPlayer
 
+-- Settings defaults cuz some people might run without
+-- I know my method to do this is ass be quiet
+if getgenv().predictEnabled == nil then
+    getgenv().predictEnabled = true
+end
+if getgenv().chatMessage == nil then
+    getgenv().chatMessage = false
+end
+if getgenv().removestormGuis == nil then
+    getgenv().removestormGuis = true
+end
+
 local function notifyUser(title, text, duration)
     game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = text, Duration = duration})
 end
