@@ -17,6 +17,9 @@ end
 if getgenv().removestormGuis == nil then
     getgenv().removestormGuis = true
 end
+if getgenv().notifyTime == nil then
+	getgenv().notifyTime = 10
+end
 
 local function notifyUser(title, text, duration)
     game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = text, Duration = duration})
@@ -30,7 +33,7 @@ local function thingyidk()
     addedConnection = char.ChildAdded:Connect(function(child)
         local function predict()
             if getgenv().predictEnabled == true then
-                notifyUser("Next Disaster", "Next Disaster is: " .. child.Value, 10)
+                notifyUser("Next Disaster", "Next Disaster is: " .. child.Value, getgenv().notifyTime)
                 if getgenv().chatMessage == true then
                     game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync("Next Disaster is: " .. child.Value)
                 end
