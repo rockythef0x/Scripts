@@ -10,8 +10,7 @@ end
 local defaultSettings = {
     ["PredictEnabled"] = true, 
     ["ChatMessage"] = false,
-    ["NoStorms"] = true,
-    ["NotifyTime"] = 15
+    ["NoStorms"] = true
 }
 
 -- Make sure the settings exist in case the loadstring is outdated
@@ -27,7 +26,7 @@ end
 
 
 local function notifyUser(title, text, duration)
-    game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = text, Duration = duration})
+    game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = text, Duration = math.huge, Button1 = "Okay"})
 end
 
 notifyUser("Prediction Enabled", "Disaster Prediction has been enabled!", 3)
