@@ -6,5 +6,5 @@ getgenv().ndsSettings = {
     ["NoStorms"] = true
 }
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/rocky-rickaby10/Scripts/refs/heads/main/ndsscript.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/rocky-rickaby10/Scripts/main/ndsscript.lua"))()
 ```
