@@ -752,13 +752,6 @@ local PlayerState = {} do
 	local cameraFocus
 	local cameraCFrame
 	local cameraFieldOfView
-	local screenGuis = {}
-	local coreGuis = {
-		Backpack = true,
-		Chat = true,
-		Health = true,
-		PlayerList = true,
-	}
 	local setCores = {
 		BadgesNotificationsActive = true,
 		PointsNotificationsActive = true,
@@ -766,30 +759,9 @@ local PlayerState = {} do
 
 	-- Save state and set up for freecam
 	function PlayerState.Push()
-		for name in pairs(coreGuis) do
-			coreGuis[name] = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType[name])
-			StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[name], false)
-		end
 		for name in pairs(setCores) do
 			setCores[name] = StarterGui:GetCore(name)
 			StarterGui:SetCore(name, false)
-		end
-		local playergui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
-		if playergui then
-			for _, gui in pairs(playergui:GetChildren()) do
-				if gui:IsA("ScreenGui") and gui.Enabled then
-					screenGuis[#screenGuis + 1] = gui
-					gui.Enabled = false
-				end
-			end
-			if FFlagUserFixFreecamGuiChangeVisibility then
-				playergui.ChildAdded:Connect(function(child)
-					if child:IsA("ScreenGui") and child.Enabled then
-						screenGuis[#screenGuis + 1] = child
-						child.Enabled = false
-					end
-				end)
-			end
 		end
 
 		cameraFieldOfView = Camera.FieldOfView
@@ -801,9 +773,6 @@ local PlayerState = {} do
 		cameraCFrame = Camera.CFrame
 		cameraFocus = Camera.Focus
 
-		mouseIconEnabled = UserInputService.MouseIconEnabled
-		UserInputService.MouseIconEnabled = false
-
 		if FFlagUserExitFreecamBreaksWithShiftlock and CheckMouseLockAvailability() then
 			mouseBehavior = Enum.MouseBehavior.Default
 		else
@@ -814,19 +783,8 @@ local PlayerState = {} do
 
 	-- Restore state
 	function PlayerState.Pop()
-		for name, isEnabled in pairs(coreGuis) do
-			StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[name], isEnabled)
-		end
 		for name, isEnabled in pairs(setCores) do
 			StarterGui:SetCore(name, isEnabled)
-		end
-		for _, gui in pairs(screenGuis) do
-			if gui.Parent then
-				gui.Enabled = true
-			end
-		end
-		if FFlagUserFixFreecamGuiChangeVisibility then
-			screenGuis = {}
 		end
 
 		Camera.FieldOfView = cameraFieldOfView
@@ -840,9 +798,6 @@ local PlayerState = {} do
 
 		Camera.Focus = cameraFocus
 		cameraFocus = nil
-
-		UserInputService.MouseIconEnabled = mouseIconEnabled
-		mouseIconEnabled = nil
 
 		UserInputService.MouseBehavior = mouseBehavior
 		mouseBehavior = nil
