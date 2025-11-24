@@ -1,6 +1,6 @@
 if IY_LOADED and not _G.IY_DEBUG == true then
-    -- error("Infinite Yield is already running!", 0)
-    return
+	-- error("Infinite Yield is already running!", 0)
+	return
 end
 
 pcall(function() getgenv().IY_LOADED = true end)
@@ -19,18 +19,18 @@ everyClipboard = missing("function", setclipboard or toclipboard or set_clipboar
 firetouchinterest = missing("function", firetouchinterest)
 waxwritefile, waxreadfile = writefile, readfile
 writefile = missing("function", waxwritefile) and function(file, data, safe)
-    if safe == true then return pcall(waxwritefile, file, data) end
-    waxwritefile(file, data)
+	if safe == true then return pcall(waxwritefile, file, data) end
+	waxwritefile(file, data)
 end
 readfile = missing("function", waxreadfile) and function(file, safe)
-    if safe == true then return pcall(waxreadfile, file) end
-    return waxreadfile(file)
+	if safe == true then return pcall(waxreadfile, file) end
+	return waxreadfile(file)
 end
 isfile = missing("function", isfile, readfile and function(file)
-    local success, result = pcall(function()
-        return readfile(file)
-    end)
-    return success and result ~= nil and result ~= ""
+	local success, result = pcall(function()
+		return readfile(file)
+	end)
+	return success and result ~= nil and result ~= ""
 end)
 makefolder = missing("function", makefolder)
 isfolder = missing("function", isfolder)
@@ -46,17 +46,17 @@ replicatesignal = missing("function", replicatesignal)
 getconnections = missing("function", getconnections or get_signal_cons)
 
 Services = setmetatable({}, {
-    __index = function(self, name)
-        local success, cache = pcall(function()
-            return cloneref(game:GetService(name))
-        end)
-        if success then
-            rawset(self, name, cache)
-            return cache
-        else
-            error("Invalid Service: " .. tostring(name))
-        end
-    end
+	__index = function(self, name)
+		local success, cache = pcall(function()
+			return cloneref(game:GetService(name))
+		end)
+		if success then
+			rawset(self, name, cache)
+			return cache
+		else
+			error("Invalid Service: " .. tostring(name))
+		end
+	end
 })
 
 COREGUI = Services.CoreGui
@@ -94,55 +94,55 @@ IYMouse = cloneref(Players.LocalPlayer:GetMouse())
 PlayerGui = cloneref(Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui"))
 PlaceId, JobId = game.PlaceId, game.JobId
 xpcall(function()
-    IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+	IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
 end, function()
-    IsOnMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+	IsOnMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 end)
 isLegacyChat = TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService
 
 -- xylex & europa
 local iyassets = {
-    ["infiniteyield/assets/bindsandplugins.png"] = "rbxassetid://5147695474",
-    ["infiniteyield/assets/close.png"] = "rbxassetid://5054663650",
-    ["infiniteyield/assets/editaliases.png"] = "rbxassetid://5147488658",
-    ["infiniteyield/assets/editkeybinds.png"] = "rbxassetid://129697930",
-    ["infiniteyield/assets/edittheme.png"] = "rbxassetid://4911962991",
-    ["infiniteyield/assets/editwaypoints.png"] = "rbxassetid://5147488592",
-    ["infiniteyield/assets/imgstudiopluginlogo.png"] = "rbxassetid://4113050383",
-    ["infiniteyield/assets/logo.png"] = "rbxassetid://1352543873",
-    ["infiniteyield/assets/minimize.png"] = "rbxassetid://2406617031",
-    ["infiniteyield/assets/pin.png"] = "rbxassetid://6234691350",
-    ["infiniteyield/assets/reference.png"] = "rbxassetid://3523243755",
-    ["infiniteyield/assets/settings.png"] = "rbxassetid://1204397029"
+	["infiniteyield/assets/bindsandplugins.png"] = "rbxassetid://5147695474",
+	["infiniteyield/assets/close.png"] = "rbxassetid://5054663650",
+	["infiniteyield/assets/editaliases.png"] = "rbxassetid://5147488658",
+	["infiniteyield/assets/editkeybinds.png"] = "rbxassetid://129697930",
+	["infiniteyield/assets/edittheme.png"] = "rbxassetid://4911962991",
+	["infiniteyield/assets/editwaypoints.png"] = "rbxassetid://5147488592",
+	["infiniteyield/assets/imgstudiopluginlogo.png"] = "rbxassetid://4113050383",
+	["infiniteyield/assets/logo.png"] = "rbxassetid://1352543873",
+	["infiniteyield/assets/minimize.png"] = "rbxassetid://2406617031",
+	["infiniteyield/assets/pin.png"] = "rbxassetid://6234691350",
+	["infiniteyield/assets/reference.png"] = "rbxassetid://3523243755",
+	["infiniteyield/assets/settings.png"] = "rbxassetid://1204397029"
 }
 
 local function getcustomasset(asset)
-    if waxgetcustomasset then
-        local success, result = pcall(function()
-            return waxgetcustomasset(asset)
-        end)
-        if success and result ~= nil and result ~= "" then
-            return result
-        end
-    end
-    return iyassets[asset]
+	if waxgetcustomasset then
+		local success, result = pcall(function()
+			return waxgetcustomasset(asset)
+		end)
+		if success and result ~= nil and result ~= "" then
+			return result
+		end
+	end
+	return iyassets[asset]
 end
 
 if makefolder and isfolder and writefile and isfile then
-    pcall(function() -- good executor trust
-        local assets = "https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/"
-        for _, folder in {"infiniteyield", "infiniteyield/assets"} do
-            if not isfolder(folder) then
-                makefolder(folder)
-            end
-        end
-        for path in iyassets do
-            if not isfile(path) then
-                writefile(path, game:HttpGet((path:gsub("infiniteyield/", assets))))
-            end
-        end
-        if IsOnMobile then writefile("infiniteyield/assets/.nomedia") end
-    end)
+	pcall(function() -- good executor trust
+		local assets = "https://raw.githubusercontent.com/infyiff/backup/refs/heads/main/"
+		for _, folder in {"infiniteyield", "infiniteyield/assets"} do
+			if not isfolder(folder) then
+				makefolder(folder)
+			end
+		end
+		for path in iyassets do
+			if not isfile(path) then
+				writefile(path, game:HttpGet((path:gsub("infiniteyield/", assets))))
+			end
+		end
+		if IsOnMobile then writefile("infiniteyield/assets/.nomedia") end
+	end)
 end
 
 currentVersion = "6.3.4"
@@ -3163,11 +3163,11 @@ end
 if type(binds) ~= "table" then binds = {} end
 
 if type(PluginsTable) == "table" then
-    for i = #PluginsTable, 1, -1 do
-        if string.sub(PluginsTable[i], -3) ~= ".iy" then
-            table.remove(PluginsTable, i)
-        end
-    end
+	for i = #PluginsTable, 1, -1 do
+		if string.sub(PluginsTable[i], -3) ~= ".iy" then
+			table.remove(PluginsTable, i)
+		end
+	end
 end
 
 function Time()
@@ -8784,7 +8784,7 @@ end)
 
 addcmd('antiafk',{'antiidle'},function(args, speaker)
 	local GC = getconnections or get_signal_cons
-	local isFakedExec = not not table.find({"jjsploit", "xeno", "velocity"}, tostring(identifyexecutor()):lower())
+	local isFakedExec = not not table.find({"jjsploit", "xeno"}, tostring(identifyexecutor()):lower())
 	
 	if GC and not isFakedExec then
 		for _, v in ipairs(GC(speaker.Idled)) do
@@ -8905,16 +8905,37 @@ addcmd('chatjoindate',{'cjd'},function(args, speaker)
 	chatMessage(chatString)
 end)
 
-addcmd('copyname',{'copyuser'},function(args, speaker)
-	for i,v in pairs(getPlayer(args[1], speaker)) do
-		toClipboard(Players[v].Name)
+function getInfoFromDB(user, id)
+	local gPlayer = getPlayer(user, speaker)
+
+	if #gPlayer > 0 then
+		return Players[gPlayer[1]].UserId
+	else
+		if (tonumber(user) and id) or (not id and not tonumber(user)) then
+			return user
+		else
+			local success, newUser = pcall(function()
+				return id and Players:GetUserIdFromNameAsync(newUser) or Players:GetNameFromUserIdAsync(newUser)
+			end)
+			if success then return newUser else notify('Player Error', 'Player was not found in Roblox Database!') end
+		end
 	end
+end
+
+addcmd('copyname',{'copyuser'},function(args, speaker)
+	toClipboard(getInfoFromDB(args[1], false))
 end)
 
 addcmd('userid',{'id'},function(args, speaker)
-	for i,v in pairs(getPlayer(args[1], speaker)) do
-		notify('User ID', Players[v].UserId)
-	end
+	notify('User ID', getInfoFromDB(args[1], true))
+end)
+
+addcmd('copyprofile', {'profile'}, function(args, speaker)
+	toClipboard("https://www.roblox.com/users/"..getInfoFromDB(args[1], true).."/profile")
+end)
+
+addcmd('copyid',{'copyuserid'},function(args, speaker)
+	toClipboard(getInfoFromDB(args[1], true))
 end)
 
 addcmd('copydisplay', {'display'}, function(args, speaker)
@@ -8924,23 +8945,11 @@ addcmd('copydisplay', {'display'}, function(args, speaker)
 end)
 
 addcmd("copyplaceid", {"placeid"}, function(args, speaker)
-    toClipboard(PlaceId)
+	toClipboard(PlaceId)
 end)
 
 addcmd("copygameid", {"gameid"}, function(args, speaker)
-    toClipboard(game.GameId)
-end)
-
-addcmd('copyprofile', {'profile'}, function(args, speaker)
-	for _, v in ipairs(getPlayer(args[1], speaker)) do
-		toClipboard("https://www.roblox.com/users/"..Players[v].UserId.."/profile")
-	end
-end)
-
-addcmd('copyid',{'copyuserid'},function(args, speaker)
-	for i,v in pairs(getPlayer(args[1], speaker)) do
-		toClipboard(Players[v].UserId)
-	end
+	toClipboard(game.GameId)
 end)
 
 addcmd('creatorid',{'creator'},function(args, speaker)
@@ -8956,11 +8965,8 @@ end)
 addcmd('copycreatorid',{'copycreator'},function(args, speaker)
 	if game.CreatorType == Enum.CreatorType.User then
 		toClipboard(game.CreatorId)
-		notify('Copied ID','Copied creator ID to clipboard')
-	elseif game.CreatorType == Enum.CreatorType.Group then
-		local OwnerID = GroupService:GetGroupInfoAsync(game.CreatorId).Owner.Id
-		toClipboard(OwnerID)
-		notify('Copied ID','Copied creator ID to clipboard')
+	elseif game.CreatorType == Enum.CreatorType.Group and args[1] ~= 'group' then
+		toClipboard(GroupService:GetGroupInfoAsync(game.CreatorId).Owner.Id)
 	end
 end)
 
@@ -10006,32 +10012,32 @@ addcmd('headthrow',{},function(args, speaker)
 end)
 
 local function anim2track(asset_id)
-    local objs = game:GetObjects(asset_id)
-    for i = 1, #objs do
-        if objs[i]:IsA("Animation") then
-            return objs[i].AnimationId
-        end
-    end
-    return asset_id
+	local objs = game:GetObjects(asset_id)
+	for i = 1, #objs do
+		if objs[i]:IsA("Animation") then
+			return objs[i].AnimationId
+		end
+	end
+	return asset_id
 end
 
 addcmd("animation", {"anim"}, function(args, speaker)
-    local animid = tostring(args[1])
-    if not animid:find("rbxassetid://") then
-        animid = "rbxassetid://" .. animid
-    end
-    animid = anim2track(animid)
-    local animation = Instance.new("Animation")
-    animation.AnimationId = animid
-    local anim = speaker.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
-    anim.Priority = Enum.AnimationPriority.Movement
-    anim:Play()
-    if args[2] then anim:AdjustSpeed(tostring(args[2])) end
+	local animid = tostring(args[1])
+	if not animid:find("rbxassetid://") then
+		animid = "rbxassetid://" .. animid
+	end
+	animid = anim2track(animid)
+	local animation = Instance.new("Animation")
+	animation.AnimationId = animid
+	local anim = speaker.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
+	anim.Priority = Enum.AnimationPriority.Movement
+	anim:Play()
+	if args[2] then anim:AdjustSpeed(tostring(args[2])) end
 end)
 
 addcmd("emote", {"em"}, function(args, speaker)
-    local anim = humanoid:PlayEmoteAndGetAnimTrackById(args[1])
-    if args[2] then anim:AdjustSpeed(tostring(args[2])) end
+	local anim = humanoid:PlayEmoteAndGetAnimTrackById(args[1])
+	if args[2] then anim:AdjustSpeed(tostring(args[2])) end
 end)
 
 addcmd('animation',{'anim'},function(args, speaker)
@@ -10687,11 +10693,11 @@ addcmd('unbubblechat',{'nobubblechat'},function(args, speaker)
 end)
 
 addcmd("chatwindow", {}, function(args, speaker)
-    TextChatService.ChatWindowConfiguration.Enabled = true
+	TextChatService.ChatWindowConfiguration.Enabled = true
 end)
 
 addcmd("unchatwindow", {"nochatwindow"}, function(args, speaker)
-    TextChatService.ChatWindowConfiguration.Enabled = false
+	TextChatService.ChatWindowConfiguration.Enabled = false
 end)
 
 addcmd('blockhead',{},function(args, speaker)
@@ -11697,9 +11703,9 @@ addcmd("antichatlogs", {"antichatlogger"}, function(args, speaker)
 end)
 
 -- Full credit to AnthonyIsntHere for this entire function
-function skidFling(TargetPlayer)
-	local speaker = game:GetService("Players").LocalPlayer
-	local Character = speaker.Character
+function SkidFling(TargetPlayer)
+	local player = game:GetService("Players").LocalPlayer
+	local Character = player.Character
 	local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
 	local RootPart = Humanoid and Humanoid.RootPart
 	
@@ -11863,7 +11869,7 @@ function skidFling(TargetPlayer)
 				end
 			end
 			task.wait()
-		until (RootPart.Position - OldPos.p).Magnitude < 25 or TRootPart:IsGrounded()
+		until (RootPart.Position - OldPos.p).Magnitude < 25
 		workspace.FallenPartsDestroyHeight = FPDH
 	end
 end
@@ -11873,7 +11879,7 @@ addcmd('skidfling', {'sfling'}, function(args, speaker)
 	for _, v in ipairs(getPlayer(args[1], speaker)) do
 		local plr = Players[v]
 		if plr and plr ~= speaker then
-			skidFling(plr)
+			SkidFling(plr)
 		end
 	end
 end)
@@ -12675,58 +12681,58 @@ end)
 
 addcmd("unsuspendchat", {}, function(args, speaker)
 	if replicatesignal then
-        replicatesignal(TextChatService.UpdateChatTimeout, speaker.UserId, 0, 10)
-    else
-        notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
-    end
+		replicatesignal(TextChatService.UpdateChatTimeout, speaker.UserId, 0, 10)
+	else
+		notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+	end
 end)
 
 addcmd("unsuspendvc", {}, function(args, speaker)
 	if replicatesignal then
-    	replicatesignal(VoiceChatService.ClientRetryJoin)
+		replicatesignal(VoiceChatService.ClientRetryJoin)
 
-    	if typeof(onVoiceModerated) ~= "RBXScriptConnection" then
-        	onVoiceModerated = Services.VoiceChatInternal.LocalPlayerModerated:Connect(function()
-            	task.wait(1)
-            	replicatesignal(VoiceChatService.ClientRetryJoin)
-        	end)
-    	end
-    else
-        notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
-    end
+		if typeof(onVoiceModerated) ~= "RBXScriptConnection" then
+			onVoiceModerated = Services.VoiceChatInternal.LocalPlayerModerated:Connect(function()
+				task.wait(1)
+				replicatesignal(VoiceChatService.ClientRetryJoin)
+			end)
+		end
+	else
+		notify("Incompatible Exploit", "Your exploit does not support this command (missing replicatesignal)")
+	end
 end)
 
 addcmd("muteallvcs", {}, function(args, speaker)
-    Services.VoiceChatInternal:SubscribePauseAll(true)
+	Services.VoiceChatInternal:SubscribePauseAll(true)
 end)
 
 addcmd("unmuteallvcs", {}, function(args, speaker)
-    Services.VoiceChatInternal:SubscribePauseAll(false)
+	Services.VoiceChatInternal:SubscribePauseAll(false)
 end)
 
 addcmd("mutevc", {}, function(args, speaker)
-    for _, plr in getPlayer(args[1], speaker) do
-        if Players[plr] == speaker then continue end
-        Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, true)
-    end
+	for _, plr in getPlayer(args[1], speaker) do
+		if Players[plr] == speaker then continue end
+		Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, true)
+	end
 end)
 
 addcmd("unmutevc", {}, function(args, speaker)
-    for _, plr in getPlayer(args[1], speaker) do
-        if Players[plr] == speaker then continue end
-        Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, false)
-    end
+	for _, plr in getPlayer(args[1], speaker) do
+		if Players[plr] == speaker then continue end
+		Services.VoiceChatInternal:SubscribePause(Players[plr].UserId, false)
+	end
 end)
 
 addcmd("phonebook", {"call"}, function(args, speaker)
-    local success, canInvite = pcall(function()
-        return SocialService:CanSendCallInviteAsync(speaker)
-    end)
-    if success and canInvite then
-        SocialService:PromptPhoneBook(speaker, "")
-    else
-        notify("Phonebook", "It seems you're not able to call anyone. Sorry!")
-    end
+	local success, canInvite = pcall(function()
+		return SocialService:CanSendCallInviteAsync(speaker)
+	end)
+	if success and canInvite then
+		SocialService:PromptPhoneBook(speaker, "")
+	else
+		notify("Phonebook", "It seems you're not able to call anyone. Sorry!")
+	end
 end)
 
 addcmd("permadeath", {}, function(args, speaker)
