@@ -8915,7 +8915,7 @@ function getInfoFromDB(user, id)
 			return user
 		else
 			local success, newUser = pcall(function()
-				return id and Players:GetUserIdFromNameAsync(newUser) or Players:GetNameFromUserIdAsync(newUser)
+				return id and Players:GetUserIdFromNameAsync(user) or Players:GetNameFromUserIdAsync(user)
 			end)
 			if success then return newUser else notify('Player Error', 'Player was not found in Roblox Database!') end
 		end
