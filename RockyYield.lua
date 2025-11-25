@@ -8906,10 +8906,11 @@ addcmd('chatjoindate',{'cjd'},function(args, speaker)
 end)
 
 function getInfoFromDB(user, id)
-	local gPlayer = getPlayer(user, speaker)
+	local gPlayer = getPlayer(user, Players.LocalPlayer)
+	local plr = Players[gPlayer[1]]
 
 	if #gPlayer > 0 then
-		return Players[gPlayer[1]].UserId
+		return id and plr.UserId or plr.Name
 	else
 		if (tonumber(user) and id) or (not id and not tonumber(user)) then
 			return user
