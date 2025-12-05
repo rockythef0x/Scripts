@@ -10,3 +10,4 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
     Text = "No Laser Death Enabled!",
     Duration = 3
 })
+methmethod(10)
