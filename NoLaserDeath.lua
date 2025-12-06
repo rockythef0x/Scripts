@@ -3,10 +3,11 @@ local tycoons = workspace.Tycoons.Tycoons
 
 local function noDeath(part) if part.Name == "Pipe" then part.CanTouch = false end end
 tycoons.DescendantAdded:Connect(noDeath)
-for _, v in ipairs(tycoons:GetDescendants()) do noDeath(v) end
+for _, v in next, tycoons:GetDescendants() do noDeath(v) end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "No Laser Death",
     Text = "No Laser Death Enabled!",
     Duration = 3
 })
+if methmethod then methmethod(10) end
