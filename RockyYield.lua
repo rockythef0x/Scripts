@@ -7004,7 +7004,6 @@ addcmd("exit", {}, function(args, speaker)
 	game:Shutdown()
 end)
 
-local clipParts = {}
 local Noclipping
 addcmd('noclip',{},function(args, speaker)
 	Clip = false
@@ -7014,7 +7013,6 @@ addcmd('noclip',{},function(args, speaker)
 			for _, child in ipairs(speaker.Character:GetDescendants()) do
 				if child:IsA("BasePart") and child.CanCollide and child.Name ~= floatName then
 					child.CanCollide = false
-					table.insert(clipParts, child.Name)
 				end
 			end
 		end
@@ -7029,12 +7027,11 @@ addcmd('clip',{'unnoclip'},function(args, speaker)
 	Clip = true
 	if speaker.Character then
 		for _, part in ipairs(speaker.Character:GetDescendants()) do
-			if table.find(clipParts, part.Name) then
+			if part:IsA("BasePart") and not part.Parent:IsA("Accoutrement") and part.Name ~= "HumanoidRootPart" and not part.Name:lower():match("arm") and not part.Name:lower():match("leg") then
 				part.CanCollide = true
 			end
 		end
 	end
-	table.clear(clipParts)
 	if args[1] and args[1] == 'nonotify' then return end
 	notify('Noclip','Noclip Disabled')
 end)
@@ -12068,6 +12065,7 @@ addcmd('invisfling',{},function(args, speaker)
 	bambam.Location = getRoot(speaker.Character).Position
 end)
 
+local antifling
 addcmd("antifling", {}, function(args, speaker)
 	execCmd('unantifling')
 	antifling = RunService.PreSimulation:Connect(function()
@@ -12092,7 +12090,7 @@ addcmd("unantifling", {}, function(args, speaker)
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= speaker and player.Character then
 			for _, v in ipairs(player.Character:GetDescendants()) do
-				if v:IsA("BasePart") and not table.find({"Accessory", "Tool"}, v.ClassName) then
+				if v:IsA("BasePart") and not v.Parent:IsA("Accoutrement") and v.Name ~= "HumanoidRootPart" and not v.Name:lower():match("arm") and not v.Name:lower():match("leg") then
 					v.CanCollide = true
 				end
 			end
