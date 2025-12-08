@@ -66,7 +66,7 @@ end)
 
 localPlr.PlayerGui.ChildAdded:Connect(function(gui)
     if ndsSettings.NoStorms == true then
-        if table.find({"SandStormGui", "BlizzardGui"}, gui.Name} then
+        if table.find({"SandStormGui", "BlizzardGui"}, gui.Name) then
             gui.Enabled = false
         end
     end
