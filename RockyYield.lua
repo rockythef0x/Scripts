@@ -7004,29 +7004,37 @@ addcmd("exit", {}, function(args, speaker)
 	game:Shutdown()
 end)
 
-local Noclipping = nil
+local clipParts = {}
+local Noclipping
 addcmd('noclip',{},function(args, speaker)
 	Clip = false
-	wait(0.1)
+	task.wait(0.1)
 	local function NoclipLoop()
-		if Clip == false and speaker.Character ~= nil then
-			for _, child in pairs(speaker.Character:GetDescendants()) do
-				if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
+		if not Clip and speaker.Character then
+			for _, child in ipairs(speaker.Character:GetDescendants()) do
+				if child:IsA("BasePart") and child.CanCollide and child.Name ~= floatName then
 					child.CanCollide = false
+					table.insert(clipParts, child.Name)
 				end
 			end
 		end
 	end
-	Noclipping = RunService.Stepped:Connect(NoclipLoop)
+	Noclipping = RunService.PreRender:Connect(NoclipLoop)
 	if args[1] and args[1] == 'nonotify' then return end
 	notify('Noclip','Noclip Enabled')
 end)
 
 addcmd('clip',{'unnoclip'},function(args, speaker)
-	if Noclipping then
-		Noclipping:Disconnect()
-	end
+	if Noclipping then Noclipping:Disconnect() end
 	Clip = true
+	if speaker.Character then
+		for _, part in ipairs(speaker.Character:GetDescendants()) do
+			if table.find(clipParts, part.Name) then
+				part.CanCollide = true
+			end
+		end
+	end
+	table.clear(clipParts)
 	if args[1] and args[1] == 'nonotify' then return end
 	notify('Noclip','Noclip Disabled')
 end)
