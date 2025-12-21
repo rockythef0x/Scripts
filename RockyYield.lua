@@ -3946,32 +3946,32 @@ if not writefileExploit() then
 	notify("Saves", "Your exploit does not support read/write file. Your settings will not save.")
 end
 
-avatarCache = {}
+avatarcache = {}
 function sendChatWebhook(player, message)
-	if httprequest and vtype(logsWebhook, "string") then
-		local id = player.UserId
-		local avatar = avatarCache[id]
-		if not avatar then
-			local url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="..id.."&size=420x420&format=Png&isCircular=false"
-			local decoded = HttpService:JSONDecode(game:HttpGet(url).data)
-			avatar = decoded and decoded[1].state == "Completed" and decoded[1].imageUrl or "https://files.catbox.moe/i968v2.jpg"
-			avatarCache[id] = avatar
-		end
-
-		local log = HttpService:JSONEncode({
-			content = message,
-			avatar_url = avatar,
-			username = formatUsername(player),
-			allowed_mentions = {parse = {}}
-		})
-
-		httprequest({
-			Url = logsWebhook,
-			Method = "POST",
-			Headers = {["Content-Type"] = "application/json"},
-			Body = log
-		})
+  if httprequest and vtype(logsWebhook, "string") then
+	local id = player.UserId
+	local avatar = avatarcache[id]
+	if not avatar then
+	  local d = HttpService:JSONDecode(httprequest({
+		Url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. id .. "&size=420x420&format=Png&isCircular=false",
+		Method = "GET"
+	  }).Body)["data"]
+	  avatar = d and d[1].state == "Completed" and d[1].imageUrl or "https://files.catbox.moe/i968v2.jpg"
+	  avatarcache[id] = avatar
 	end
+	local log = HttpService:JSONEncode({
+	  content = message,
+	  avatar_url = avatar,
+	  username = formatUsername(player),
+	  allowed_mentions = {parse = {}}
+	})
+	httprequest({
+	  Url = logsWebhook,
+	  Method = "POST",
+	  Headers = {["Content-Type"] = "application/json"},
+	  Body = log
+	})
+  end
 end
 
 ChatLog = function(player)
