@@ -1,7 +1,4 @@
-if IY_LOADED and not _G.IY_DEBUG then
-	-- error("Infinite Yield is already running!", 0)
-	return
-end
+do return warn("This script is outdated and no longer intended for use") end
 
 pcall(function() getgenv().IY_LOADED = true end)
 if not game:IsLoaded() then game.Loaded:Wait() end
